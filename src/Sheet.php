@@ -80,14 +80,14 @@ class Sheet
     protected $exportable;
 
     /**
-     * @var Worksheet
-     */
-    private $worksheet;
-
-    /**
      * @var ColumnCollection
      */
     protected $columns;
+
+    /**
+     * @var Worksheet
+     */
+    private $worksheet;
 
     /**
      * @param Worksheet $worksheet
@@ -630,7 +630,7 @@ class Sheet
 
         if ($sheetExport instanceof WithColumns) {
             foreach ($rows as $row) {
-                ++$rowNumber;
+                $rowNumber++;
                 $this->columns->each(function (Column $column) use ($rowNumber, $row) {
                     $column->write($this->worksheet, $rowNumber, $row);
                 });
