@@ -4,7 +4,12 @@ namespace Maatwebsite\Excel;
 
 use ArrayAccess;
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Columns\Column;
+use Maatwebsite\Excel\Columns\ColumnCollection;
+use Maatwebsite\Excel\Columns\EmptyCell;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row as SpreadsheetRow;
 
 class Row implements ArrayAccess
@@ -49,11 +54,28 @@ class Row implements ArrayAccess
         return $this->row;
     }
 
+    public function toArrayWithColumns(ColumnCollection $columns): array
+    {
+        $row = [];
+        foreach ($this->row->getCellIterator($columns->start(), $columns->end()) as $cell) {
+            /** @var Column $column */
+            $column = $columns->get($cell->getColumn());
+
+            // Skip columns that were not requested.
+            if (!$column || $column instanceof EmptyCell) {
+                continue;
+            }
+
+            $row[$column->title()] = $column->read($cell);
+        }
+
+        return $row;
+    }
+
     /**
      * @param null        $nullValue
      * @param bool        $calculateFormulas
      * @param bool        $formatData
-     *
      * @param string|null $endColumn
      *
      * @return Collection
@@ -139,6 +161,7 @@ class Row implements ArrayAccess
 
     /**
      * @param \Closure $preparationCallback
+     *
      * @internal
      */
     public function setPreparationCallback(Closure $preparationCallback = null)

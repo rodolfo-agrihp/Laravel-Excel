@@ -77,10 +77,10 @@ class ModelManager
     }
 
     /**
-     * @param ToModel $import
-     * @param array   $attributes
-     *
+     * @param ToModel  $import
+     * @param array    $attributes
      * @param int|null $rowNumber
+     *
      * @return Model[]|Collection
      */
     public function toModels(ToModel $import, array $attributes, $rowNumber = null): Collection
@@ -90,6 +90,10 @@ class ModelManager
         }
 
         $model = $import->model($attributes);
+
+        if (is_string($model) && class_exists($model)) {
+            $model = $model::query()->newModelInstance($attributes);
+        }
 
         if (null !== $model) {
             return \is_array($model) ? new Collection($model) : new Collection([$model]);

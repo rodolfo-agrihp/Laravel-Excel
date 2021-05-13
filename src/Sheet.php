@@ -267,6 +267,8 @@ class Sheet
      */
     public function import($import, int $startRow = 1)
     {
+        $this->columns  = ColumnCollection::makeFrom($import);
+
         if ($import instanceof WithEvents) {
             $this->registerListeners($import->registerEvents());
         }
@@ -371,7 +373,11 @@ class Sheet
                 continue;
             }
 
-            $row = $row->toArray($nullValue, $calculateFormulas, $formatData, $endColumn);
+            if ($import instanceof WithColumns) {
+                $row = $row->toArrayWithColumns($this->columns);
+            } else {
+                $row = $row->toArray($nullValue, $calculateFormulas, $formatData, $endColumn);
+            }
 
             if ($import instanceof WithMapping) {
                 $row = $import->map($row);
