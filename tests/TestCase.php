@@ -15,8 +15,8 @@ class TestCase extends OrchestraTestCase
      * @param string $filePath
      * @param string $writerType
      *
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
     public function read(string $filePath, string $writerType)
     {
@@ -49,8 +49,8 @@ class TestCase extends OrchestraTestCase
      * @param string   $writerType
      * @param int|null $sheetIndex
      *
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @return array
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     protected function readAsArray(string $filePath, string $writerType, int $sheetIndex = null)
     {
@@ -124,11 +124,7 @@ class TestCase extends OrchestraTestCase
      */
     protected function assertStringContains(string $needle, string $haystack, string $message = '')
     {
-        if (method_exists($this, 'assertStringContainsString')) {
-            $this->assertStringContainsString($needle, $haystack, $message);
-        } else {
-            static::assertThat($haystack, new StringContains($needle, false), $message);
-        }
+        $this->assertStringContainsString($needle, $haystack, $message);
     }
 
     /**
@@ -136,10 +132,12 @@ class TestCase extends OrchestraTestCase
      */
     protected function assertFileMissing(string $path)
     {
-        if (method_exists($this, 'assertFileDoesNotExist')) {
-            $this->assertFileDoesNotExist($path);
-        } else {
-            $this->assertFileNotExists($path);
-        }
+        $this->assertFileDoesNotExist($path);
+    }
+
+    protected function tearDown(): void
+    {
+        config()->set('excel.imports.read_only', true);
+        parent::tearDown();
     }
 }

@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Exporting via Column declarations
+- Importing via Column declarations
+
 ## [3.1.30] - 2021-04-06
 
 ### Added
