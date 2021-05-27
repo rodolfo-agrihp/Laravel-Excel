@@ -9,6 +9,7 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithColumnLimit;
 use Maatwebsite\Excel\Concerns\WithColumns;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithProgressBar;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -52,6 +53,7 @@ class ModelImporter
         $withCalcFormulas = $import instanceof WithCalculatedFormulas;
         $withValidation   = $import instanceof WithValidation && method_exists($import, 'prepareForValidation');
         $endColumn        = $import instanceof WithColumnLimit ? $import->endColumn() : null;
+        $columns          = ColumnCollection::makeFrom($import, $headingRow);
 
         $this->manager->setRemembersRowNumber(method_exists($import, 'rememberRowNumber'));
 
@@ -62,7 +64,7 @@ class ModelImporter
             $row = new Row($spreadSheetRow, $headingRow);
             if (!$import instanceof SkipsEmptyRows || ($import instanceof SkipsEmptyRows && !$row->isEmpty())) {
                 if ($import instanceof WithColumns) {
-                    $rowArray = $row->toArrayWithColumns(ColumnCollection::makeFrom($import));
+                    $rowArray = $row->toArrayWithColumns($columns);
                 } else {
                     $rowArray = $row->toArray(null, $withCalcFormulas, true, $endColumn);
                 }
